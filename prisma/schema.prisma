@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  firstName     String
+  lastName      String
+  email         String?  @unique
+  countryCode   String?
+  phone         String?
+  password      String
+  emailVerified          Boolean   @default(false)
+  phoneVerified          Boolean   @default(false)
+  profession             String?
+  professionSelectedAt   DateTime?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  @@unique([countryCode, phone])
+}
+
+model PendingRegistration {
+  id           String   @id @default(cuid())
+  firstName    String
+  lastName     String
+  email        String?
+  countryCode  String?
+  phone        String?
+  password     String
+  method       String
+  otpHash      String
+  otpExpiresAt DateTime
+  createdAt    DateTime @default(now())
+}

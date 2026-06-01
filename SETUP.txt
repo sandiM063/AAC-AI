@@ -1,0 +1,223 @@
+================================================================================
+AAC Communicate — Project setup & database guide
+================================================================================
+
+Stack: Next.js 16, TypeScript, Tailwind CSS v4, Prisma + SQLite, Resend (email OTP), Twilio (SMS OTP)
+
+
+--------------------------------------------------------------------------------
+1. PREREQUISITES
+--------------------------------------------------------------------------------
+
+  - Node.js 20+ (recommended)
+  - npm (comes with Node.js)
+
+
+--------------------------------------------------------------------------------
+2. FIRST-TIME PROJECT SETUP
+--------------------------------------------------------------------------------
+
+  Open a terminal in the project folder, then run:
+
+    npm install
+
+  Copy the environment template and edit your values:
+
+    copy .env.example .env          (Windows)
+    cp .env.example .env            (macOS / Linux)
+
+  Required in .env:
+
+    DATABASE_URL="file:./dev.db"
+
+  Optional (for real OTP delivery — see section 6):
+
+    RESEND_API_KEY=
+    OTP_EMAIL_FROM="AAC Communicate <onboarding@resend.dev>"
+    TWILIO_ACCOUNT_SID=
+    TWILIO_AUTH_TOKEN=
+    TWILIO_PHONE_NUMBER=
+
+  Create the database and apply migrations:
+
+    npm run db:sync
+
+  (Runs: prisma migrate deploy && prisma generate)
+
+  Seed the demo user (optional but useful for testing login):
+
+    npm run db:seed
+
+  Start the dev server:
+
+    npm run dev
+
+  Open in browser:
+
+    http://localhost:3000
+
+  Default routes:
+    /login          — Sign up / Sign in
+    /verify         — OTP verification (after registration)
+    /onboarding/profession — Pick profession (after first login)
+    /dashboard      — Main app (after auth + profession)
+
+
+--------------------------------------------------------------------------------
+3. DEMO USER (after seed)
+--------------------------------------------------------------------------------
+
+  Email:    demo@aac.app
+  Password: demo12345
+
+  Note: Demo user may still need profession onboarding if not set in the DB.
+
+
+--------------------------------------------------------------------------------
+4. DATABASE COMMANDS (quick reference)
+--------------------------------------------------------------------------------
+
+  npm run db:sync       Apply migrations + regenerate Prisma client
+  npm run db:migrate    Create/apply a new migration in development
+  npm run db:generate   Regenerate Prisma client only
+  npm run db:seed       Create/update demo user (demo@aac.app)
+
+  Database file location: prisma/dev.db
+  (Must match DATABASE_URL="file:./dev.db" — path is relative to prisma/ folder)
+
+
+--------------------------------------------------------------------------------
+5. RESET DATABASE (delete all users & data)
+--------------------------------------------------------------------------------
+
+  Stop the dev server first (Ctrl+C) if reset fails due to a locked DB file.
+
+  Full reset — wipes everything, reapplies migrations, then re-seed demo user:
+
+    npx prisma migrate reset --force
+    npm run db:seed
+
+  Reset without demo user:
+
+    npx prisma migrate reset --force
+
+  Manual reset (if migrate reset has issues):
+
+    Delete file: prisma/dev.db
+    npm run db:sync
+    npm run db:seed
+
+  Re-seed demo user only (does NOT delete existing users):
+
+    npm run db:seed
+
+
+--------------------------------------------------------------------------------
+6. OTP / VERIFICATION SETUP (required for registration)
+--------------------------------------------------------------------------------
+
+  OTP is always sent via real email or SMS. Configure the provider for the
+  method you use. Restart the dev server after changing .env (Ctrl+C, npm run dev).
+
+  A) Email OTP (Resend — https://resend.com)
+
+     RESEND_API_KEY=re_xxxxxxxx
+     OTP_EMAIL_FROM="AAC Communicate <onboarding@resend.dev>"
+
+     Sandbox limit: onboarding@resend.dev can only send to the email address
+     verified on your Resend account. For production, verify your own domain
+     and update OTP_EMAIL_FROM.
+
+  B) SMS OTP (Twilio — https://console.twilio.com)
+
+     TWILIO_ACCOUNT_SID=ACxxxxxxxx
+     TWILIO_AUTH_TOKEN=xxxxxxxx
+     TWILIO_PHONE_NUMBER=+1xxxxxxxxxx
+
+     IMPORTANT:
+       - TWILIO_PHONE_NUMBER must be a Twilio sender number (from Console →
+         Phone Numbers → Get/Buy a number). It is NOT your personal cell.
+       - Trial accounts: only send to verified numbers (Console → Verified
+         Caller IDs). Your signup phone is auto-verified.
+       - Trial accounts: ~100 free SMS, 30-day trial; custom message bodies
+         may require upgrading the account.
+
+     Common error: "To and From number cannot be the same"
+       → You used your personal phone as TWILIO_PHONE_NUMBER. Use the Twilio
+         number instead.
+
+
+--------------------------------------------------------------------------------
+7. AUTH FLOW
+--------------------------------------------------------------------------------
+
+  New user:
+    /login (Sign up) → /verify (OTP) → /onboarding/profession → /dashboard
+
+  Returning user:
+    /login (Sign in) → /dashboard (or /onboarding/profession if not set)
+
+  Logged out:
+    / → redirects to /login
+
+  Logged in:
+    / → redirects to /dashboard or profession onboarding
+
+
+--------------------------------------------------------------------------------
+8. PRODUCTION BUILD
+--------------------------------------------------------------------------------
+
+    npm run build
+    npm start
+
+  Ensure .env (or host environment variables) includes DATABASE_URL and any
+  OTP keys. Run migrations on deploy:
+
+    npm run db:sync
+
+
+--------------------------------------------------------------------------------
+9. TROUBLESHOOTING
+--------------------------------------------------------------------------------
+
+  "Something went wrong" on register
+    → Check terminal for [AAC] errors. Often DB or OTP related.
+
+  Prisma "column does not exist" or unknown field
+    → npm run db:sync
+    → Restart dev server
+
+  Database locked during reset
+    → Stop npm run dev, then run reset again
+
+  OTP not received (email)
+    → Resend sandbox: use your verified Resend email only
+    → Check spam folder
+
+  OTP not received (SMS)
+    → Confirm TWILIO_PHONE_NUMBER is a Twilio number, not your personal phone
+    → Verify recipient number in Twilio Console (trial accounts)
+    → Check terminal for [AAC] OTP delivery failed messages
+
+  Changes to .env not applied
+    → Always restart the dev server after editing .env
+
+  Stale Prisma client after schema changes
+    → npm run db:generate
+    → Restart dev server
+
+
+--------------------------------------------------------------------------------
+10. USEFUL NPM SCRIPTS
+--------------------------------------------------------------------------------
+
+  npm run dev         Start development server
+  npm run build       Production build
+  npm run start       Run production server
+  npm run lint        Run ESLint
+  npm run db:sync     Migrate + generate Prisma client
+  npm run db:migrate  Dev migration workflow
+  npm run db:seed     Seed demo user
+
+================================================================================
