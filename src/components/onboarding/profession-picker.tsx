@@ -61,8 +61,8 @@ export function ProfessionPicker({ firstName }: ProfessionPickerProps) {
           Welcome, {firstName}. What is your profession?
         </h1>
         <p className="profession-picker-subtitle">
-          Search for your field to load the right presets and tools. More
-          professions will be added over time.
+          Physicians, caregivers, and educators share communication goals but get
+          different presets and templates. Search to find your role.
         </p>
       </header>
 
@@ -110,7 +110,7 @@ export function ProfessionPicker({ firstName }: ProfessionPickerProps) {
               profession={profession}
               selected={selectedId === profession.id}
               onSelect={() => {
-                setSelectedId(profession.id);
+                setSelectedId(profession.id as ProfessionId);
                 setError(null);
               }}
             />

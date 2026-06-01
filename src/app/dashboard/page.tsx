@@ -2,25 +2,70 @@ import { getProfession } from "@/lib/professions";
 import { getCurrentUser } from "@/lib/user-session";
 
 const GETTING_STARTED_BY_PROFESSION = {
+  physician: [
+    {
+      title: "Set up a clinical communication board",
+      description: "Start with exam, consent, and bedside phrases for patient visits.",
+      action: "Create board",
+    },
+    {
+      title: "Add diagnostic & treatment phrases",
+      description: "Preset messages for explaining plans, symptoms, and next steps.",
+      action: "Browse presets",
+    },
+    {
+      title: "Configure medical templates",
+      description: "Specialty-specific boards and clinical workflows (coming soon).",
+      action: "Learn more",
+    },
+    {
+      title: "Share with your care team",
+      description: "Coordinate boards with nurses, specialists, and staff.",
+      action: "Invite",
+    },
+  ],
+  caregiver: [
+    {
+      title: "Set up a daily needs board",
+      description: "Build phrases for comfort, meals, mobility, and personal care.",
+      action: "Create board",
+    },
+    {
+      title: "Add family update phrases",
+      description: "Quick messages for handoffs, routines, and check-ins.",
+      action: "Browse presets",
+    },
+    {
+      title: "Explore caregiver templates",
+      description: "Home care and support presets tailored to your setting (coming soon).",
+      action: "Learn more",
+    },
+    {
+      title: "Invite family or co-caregivers",
+      description: "Share boards with relatives, aides, or support workers.",
+      action: "Invite",
+    },
+  ],
+  /** @deprecated Legacy combined profession before physician/caregiver split */
   physician_caregiver: [
     {
-      title: "Set up a patient communication board",
+      title: "Update your profession",
+      description: "Choose Physician or Caregiver for templates tailored to your role.",
+      action: "Open profile",
+    },
+    {
+      title: "Set up a communication board",
       description: "Start with phrases for greetings, needs, and comfort.",
       action: "Create board",
     },
     {
-      title: "Add caregiver quick phrases",
-      description: "Preset messages for family updates and handoffs.",
+      title: "Browse shared presets",
+      description: "Clinical and caregiver phrase sets until you update your profession.",
       action: "Browse presets",
     },
     {
-      title: "Configure clinical presets",
-      description: "Templates for common patient interactions (coming soon).",
-      action: "Learn more",
-    },
-    {
-      title: "Invite care team members",
-      description: "Share boards with nurses, therapists, or family.",
+      title: "Invite collaborators",
+      description: "Share boards with your care team or family.",
       action: "Invite",
     },
   ],

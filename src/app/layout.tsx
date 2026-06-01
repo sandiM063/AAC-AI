@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import "./landing.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,7 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "AAC Communicate",
   description:
-    "Augmentative and Alternative Communication — create an account or sign in.",
+    "Augmentative and Alternative Communication — symbol boards, AI assistance, and tools for caregivers and educators.",
 };
 
 export default function RootLayout({
