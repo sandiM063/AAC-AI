@@ -20,10 +20,87 @@ model User {
   phoneVerified          Boolean   @default(false)
   profession             String?
   professionSelectedAt   DateTime?
+  theme                  String    @default("green")
+  language               String    @default("en")
+  aacExperience          String?
+  wantsTutorial          Boolean?
+  onboardingCompletedAt  DateTime?
+  profileImageUpdatedAt  DateTime?
   createdAt              DateTime  @default(now())
   updatedAt              DateTime  @updatedAt
 
+  assistantMessages      AssistantMessage[]
+  assistantMemoryChunks  AssistantMemoryChunk[]
+  presetInteractions     CommunityPresetInteraction[]
+
   @@unique([countryCode, phone])
+}
+
+model CommunityPreset {
+  id               String   @id @default(cuid())
+  type             String
+  slug             String   @unique
+  name             String
+  description      String?
+  coverSymbolId    String
+  coverPictogramId Int
+  profession       String?
+  stepCount        Int      @default(0)
+  tileCount        Int      @default(0)
+  payload          String
+  likeCount        Int      @default(0)
+  favoriteCount    Int      @default(0)
+  dailyUserCount   Int      @default(0)
+  useCount         Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  interactions CommunityPresetInteraction[]
+
+  @@index([type])
+}
+
+model CommunityPresetInteraction {
+  id         String    @id @default(cuid())
+  userId     String
+  presetId   String
+  liked      Boolean   @default(false)
+  favorited  Boolean   @default(false)
+  lastUsedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  preset CommunityPreset @relation(fields: [presetId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, presetId])
+  @@index([presetId])
+}
+
+model AssistantMessage {
+  id        String   @id @default(cuid())
+  userId    String
+  role      String
+  content   String
+  metadata  String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model AssistantMemoryChunk {
+  id        String   @id @default(cuid())
+  userId    String
+  messageId String?
+  content   String
+  embedding String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }
 
 model PendingRegistration {

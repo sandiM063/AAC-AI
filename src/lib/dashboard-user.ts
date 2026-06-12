@@ -1,3 +1,4 @@
+import { getAvatarUrl } from "@/lib/profile-image-url";
 import { getProfessionLabel } from "@/lib/professions";
 
 export type DashboardUserRecord = {
@@ -7,6 +8,7 @@ export type DashboardUserRecord = {
   countryCode: string | null;
   phone: string | null;
   profession: string | null;
+  profileImageUpdatedAt?: Date | null;
 };
 
 export function toDashboardUser(user: DashboardUserRecord) {
@@ -23,5 +25,11 @@ export function toDashboardUser(user: DashboardUserRecord) {
     .toUpperCase()
     .slice(0, 2);
 
-  return { displayName, contact, initials, professionId: user.profession };
+  return {
+    displayName,
+    contact,
+    initials,
+    professionId: user.profession,
+    avatarUrl: getAvatarUrl(user.profileImageUpdatedAt),
+  };
 }

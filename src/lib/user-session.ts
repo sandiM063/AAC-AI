@@ -16,10 +16,24 @@ export async function getCurrentUser() {
       phone: true,
       profession: true,
       professionSelectedAt: true,
+      theme: true,
+      language: true,
+      aacExperience: true,
+      wantsTutorial: true,
+      onboardingCompletedAt: true,
+      profileImageUpdatedAt: true,
+      createdAt: true,
     },
   });
 }
 
+export function userNeedsOnboarding(user: {
+  onboardingCompletedAt: Date | null;
+}) {
+  return !user.onboardingCompletedAt;
+}
+
+/** @deprecated Use userNeedsOnboarding */
 export function userNeedsProfession(user: { profession: string | null }) {
   return !user.profession;
 }

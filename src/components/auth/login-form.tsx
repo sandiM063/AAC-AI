@@ -43,7 +43,7 @@ export function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => vo
       const data = (await response.json()) as {
         error?: string;
         fieldErrors?: Record<string, string>;
-        needsProfession?: boolean;
+        needsOnboarding?: boolean;
       };
 
       if (!response.ok) {
@@ -56,7 +56,7 @@ export function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => vo
       }
 
       router.push(
-        data.needsProfession ? "/onboarding/profession" : "/dashboard",
+        data.needsOnboarding ? "/onboarding" : "/dashboard",
       );
       router.refresh();
     } catch {

@@ -100,7 +100,7 @@ export function VerifyForm({
         return;
       }
 
-      router.push("/onboarding/profession");
+      router.push("/onboarding");
       router.refresh();
     } catch {
       setError("Unable to connect. Please try again.");

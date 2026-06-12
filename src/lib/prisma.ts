@@ -1,13 +1,12 @@
 import { PrismaClient } from "@/generated/prisma/client";
+import { createHash } from "crypto";
+import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
-/** Bump when prisma/schema.prisma changes so dev clears a stale cached client. */
-const PRISMA_SCHEMA_VERSION = 3;
-
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
-  prismaSchemaVersion?: number;
+  prismaClientFingerprint?: string;
 };
 
 function getProjectRoot(): string {
@@ -43,6 +42,26 @@ function resolveDatabaseUrl(): string {
   return `file:${path.join(projectRoot, relativePath)}`;
 }
 
+function getGeneratedClientFingerprint(): string {
+  const classPath = path.join(
+    getProjectRoot(),
+    "src",
+    "generated",
+    "prisma",
+    "internal",
+    "class.ts",
+  );
+
+  try {
+    return createHash("sha256")
+      .update(fs.readFileSync(classPath))
+      .digest("hex")
+      .slice(0, 16);
+  } catch {
+    return "unknown";
+  }
+}
+
 function createPrismaClient(): PrismaClient {
   const databaseUrl = resolveDatabaseUrl();
 
@@ -52,12 +71,18 @@ function createPrismaClient(): PrismaClient {
   });
 }
 
-if (
-  process.env.NODE_ENV !== "production" &&
-  globalForPrisma.prismaSchemaVersion !== PRISMA_SCHEMA_VERSION
-) {
-  globalForPrisma.prisma = undefined;
-  globalForPrisma.prismaSchemaVersion = PRISMA_SCHEMA_VERSION;
+const prismaClientFingerprint = getGeneratedClientFingerprint();
+
+if (process.env.NODE_ENV !== "production") {
+  if (
+    globalForPrisma.prisma &&
+    globalForPrisma.prismaClientFingerprint !== prismaClientFingerprint
+  ) {
+    void globalForPrisma.prisma.$disconnect();
+    globalForPrisma.prisma = undefined;
+  }
+
+  globalForPrisma.prismaClientFingerprint = prismaClientFingerprint;
 }
 
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();

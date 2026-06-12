@@ -1,16 +1,31 @@
 import type { ReactNode } from "react";
-import { DashboardSidebar, type DashboardUser } from "./dashboard-sidebar";
+import type { DashboardUser } from "./dashboard-sidebar";
+import { DashboardShellClient } from "./dashboard-shell-client";
+import type { StoredProfessionId } from "@/lib/professions";
 
 type DashboardShellProps = {
   user: DashboardUser;
+  userId: string;
+  professionId: StoredProfessionId | null;
+  wantsTutorial: boolean;
   children: ReactNode;
 };
 
-export function DashboardShell({ user, children }: DashboardShellProps) {
+export function DashboardShell({
+  user,
+  userId,
+  professionId,
+  wantsTutorial,
+  children,
+}: DashboardShellProps) {
   return (
-    <div className="dashboard-layout">
-      <DashboardSidebar user={user} />
-      <div className="dashboard-main">{children}</div>
-    </div>
+    <DashboardShellClient
+      user={user}
+      userId={userId}
+      professionId={professionId}
+      wantsTutorial={wantsTutorial}
+    >
+      {children}
+    </DashboardShellClient>
   );
 }

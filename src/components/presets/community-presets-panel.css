@@ -1,0 +1,216 @@
+.community-presets-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.community-presets-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.community-presets-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #18181b;
+}
+
+.community-presets-desc {
+  margin: 0.25rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: #71717a;
+}
+
+.community-presets-loading,
+.community-presets-empty {
+  margin: 0;
+  padding: 1.5rem 0.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: #a1a1aa;
+}
+
+.community-presets-error {
+  padding: 0.75rem 0.875rem;
+  border-radius: 0.625rem;
+  border: 1px solid #fcd34d;
+  background: #fffbeb;
+  font-size: 0.875rem;
+  color: #78350f;
+}
+
+.community-presets-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 640px) {
+  .community-presets-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .community-presets-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.community-preset-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e4e4e7;
+  border-radius: 0.875rem;
+  background: #ffffff;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgb(24 24 27 / 4%);
+}
+
+.community-preset-card-cover {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 7rem;
+  padding: 1rem;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--aac-primary-light) 55%, #ffffff) 0%,
+    #ffffff 100%
+  );
+}
+
+.community-preset-cover-symbol {
+  width: 4.5rem;
+  height: 4.5rem;
+}
+
+.community-preset-cover-symbol img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.community-preset-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  padding: 1rem;
+}
+
+.community-preset-name {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #18181b;
+}
+
+.community-preset-description {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: #52525b;
+}
+
+.community-preset-unit {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--aac-primary);
+}
+
+.community-preset-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 0.75rem;
+  margin: 0;
+}
+
+.community-preset-stats div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.community-preset-stats dt {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #a1a1aa;
+}
+
+.community-preset-stats dd {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #27272a;
+}
+
+.community-preset-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.community-preset-icon-btn {
+  min-height: var(--touch-target, 2.75rem);
+  padding: 0.4375rem 0.75rem;
+  border: 1px solid #e4e4e7;
+  border-radius: 9999px;
+  background: #ffffff;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #52525b;
+  cursor: pointer;
+}
+
+.community-preset-icon-btn:hover {
+  border-color: color-mix(in srgb, var(--aac-primary) 35%, #e4e4e7);
+}
+
+.community-preset-icon-btn-active {
+  border-color: var(--aac-primary);
+  background: color-mix(in srgb, var(--aac-primary-light) 45%, #ffffff);
+  color: var(--aac-primary);
+}
+
+.community-preset-use-btn {
+  flex: 1 1 100%;
+  min-height: var(--touch-target, 2.75rem);
+  margin-top: 0;
+}
+
+.board-view-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.board-view-tab {
+  min-height: var(--touch-target, 2.75rem);
+  padding: 0.5rem 1rem;
+  border: 1px solid #e4e4e7;
+  border-radius: 9999px;
+  background: #ffffff;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #52525b;
+  cursor: pointer;
+}
+
+.board-view-tab-active {
+  border-color: var(--aac-primary);
+  background: color-mix(in srgb, var(--aac-primary-light) 55%, #ffffff);
+  color: var(--aac-primary);
+}

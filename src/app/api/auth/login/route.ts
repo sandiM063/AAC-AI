@@ -49,7 +49,7 @@ export async function POST(request: Request) {
         email: user.email,
         profession: user.profession,
       },
-      needsProfession: !user.profession,
+      needsOnboarding: !user.onboardingCompletedAt,
     });
 
     response.cookies.set(SESSION_COOKIE, user.id, {

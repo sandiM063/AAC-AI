@@ -1,5 +1,20 @@
+import { GettingStartedChecklist } from "@/components/dashboard/getting-started-checklist";
+import type { GettingStartedItem } from "@/components/dashboard/getting-started-checklist";
+import { OverviewStats } from "@/components/dashboard/overview-stats";
+import { IntegrationsPanel } from "@/components/dashboard/integrations-panel";
+import { getServerTranslator } from "@/lib/i18n/server";
 import { getProfession } from "@/lib/professions";
 import { getCurrentUser } from "@/lib/user-session";
+
+const ACTION_HREFS: Record<string, string> = {
+  "Create board": "/dashboard/boards",
+  "Browse presets": "/dashboard/communication",
+  "Learn more": "/dashboard/help",
+  Invite: "/dashboard/help#collaboration",
+  "Open profile": "/dashboard/profile",
+  "Get started": "/dashboard/communication",
+  "Ask AI": "/dashboard/assistant",
+};
 
 const GETTING_STARTED_BY_PROFESSION = {
   physician: [
@@ -46,7 +61,6 @@ const GETTING_STARTED_BY_PROFESSION = {
       action: "Invite",
     },
   ],
-  /** @deprecated Legacy combined profession before physician/caregiver split */
   physician_caregiver: [
     {
       title: "Update your profession",
@@ -106,8 +120,8 @@ const DEFAULT_GETTING_STARTED = [
   },
   {
     title: "Try AI suggestions",
-    description: "Enable smart phrase recommendations (coming soon).",
-    action: "Learn more",
+    description: "Ask the AI Assistant for phrase and routine ideas.",
+    action: "Ask AI",
   },
   {
     title: "Invite collaborators",
@@ -116,49 +130,49 @@ const DEFAULT_GETTING_STARTED = [
   },
 ];
 
-const QUICK_STATS = [
-  { label: "Boards", value: "0" },
-  { label: "Phrases saved", value: "0" },
-  { label: "Sessions this week", value: "0" },
-];
-
-const INTEGRATIONS = [
-  { name: "Text-to-speech", description: "Connect a voice engine for spoken output." },
-  { name: "Cloud sync", description: "Back up boards across your devices." },
-  { name: "Collaboration", description: "Link teammates to shared boards." },
-];
+function withLinks(
+  items: readonly { title: string; description: string; action: string }[],
+): GettingStartedItem[] {
+  return items.map((item) => ({
+    ...item,
+    href: ACTION_HREFS[item.action] ?? "/dashboard/help",
+  }));
+}
 
 export default async function DashboardOverviewPage() {
   const user = await getCurrentUser();
+  const t = await getServerTranslator();
   const profession = getProfession(user?.profession ?? null);
 
-  const gettingStarted =
+  const gettingStartedRaw =
     user?.profession && user.profession in GETTING_STARTED_BY_PROFESSION
       ? GETTING_STARTED_BY_PROFESSION[
           user.profession as keyof typeof GETTING_STARTED_BY_PROFESSION
         ]
       : DEFAULT_GETTING_STARTED;
 
+  const gettingStarted = withLinks(gettingStartedRaw);
+
   return (
     <div className="dashboard-content">
-      <header className="dashboard-page-header">
+      <header className="dashboard-page-header" data-tutorial="overview-header">
         <div>
-          <h1 className="dashboard-page-title">Overview</h1>
+          <h1 className="dashboard-page-title">{t("pages.overview.title")}</h1>
           <p className="dashboard-page-subtitle">
             {profession
-              ? `${profession.label} workspace — preset datasets and tools coming soon.`
-              : "Your AAC workspace"}
+              ? t("pages.overview.subtitleWithProfession", { profession: profession.label })
+              : t("pages.overview.subtitle")}
           </p>
         </div>
         <div className="dashboard-progress-pill">
           <span className="dashboard-progress-ring" aria-hidden />
-          <span>0/4 completed</span>
+          <span>{t("pages.overview.progress", { completed: 0, total: 4 })}</span>
         </div>
       </header>
 
       {profession && (
         <section className="dashboard-card dashboard-profession-banner">
-          <p className="dashboard-profession-banner-label">Your profession</p>
+          <p className="dashboard-profession-banner-label">{t("pages.overview.yourProfession")}</p>
           <h2 className="dashboard-profession-banner-title">{profession.label}</h2>
           <p className="dashboard-profession-banner-desc">{profession.description}</p>
           <ul className="dashboard-profession-banner-features">
@@ -169,52 +183,25 @@ export default async function DashboardOverviewPage() {
         </section>
       )}
 
-      <section className="dashboard-card">
-        <div className="dashboard-card-header">
-          <h2 className="dashboard-card-title">Getting started</h2>
-        </div>
-        <ul className="dashboard-checklist">
-          {gettingStarted.map((item, index) => (
-            <li
-              key={item.title}
-              className={`dashboard-checklist-item ${index === 0 ? "dashboard-checklist-item-active" : ""}`}
-            >
-              <span className="dashboard-check-circle" aria-hidden />
-              <div className="dashboard-checklist-body">
-                <p className="dashboard-checklist-title">{item.title}</p>
-                <p className="dashboard-checklist-desc">{item.description}</p>
-                {index === 0 && (
-                  <button type="button" className="dashboard-btn dashboard-btn-primary">
-                    {item.action}
-                  </button>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <GettingStartedChecklist
+        title={t("pages.overview.gettingStarted")}
+        items={gettingStarted}
+      />
 
-      <section className="dashboard-stats-grid">
-        {QUICK_STATS.map((stat) => (
-          <article key={stat.label} className="dashboard-card dashboard-stat-card">
-            <p className="dashboard-stat-label">{stat.label}</p>
-            <p className="dashboard-stat-value">{stat.value}</p>
-          </article>
-        ))}
-      </section>
+      {user && <OverviewStats userId={user.id} />}
 
       <section className="dashboard-card">
         <div className="dashboard-card-header dashboard-card-header-row">
-          <h2 className="dashboard-card-title">Activity</h2>
-          <div className="dashboard-segmented" role="tablist" aria-label="Activity range">
+          <h2 className="dashboard-card-title">{t("pages.overview.activity")}</h2>
+          <div className="dashboard-segmented" role="tablist" aria-label={t("pages.overview.activity")}>
             <button type="button" className="dashboard-segment dashboard-segment-active">
-              All
+              {t("pages.overview.activityAll")}
             </button>
             <button type="button" className="dashboard-segment">
-              Week
+              {t("pages.overview.activityWeek")}
             </button>
             <button type="button" className="dashboard-segment">
-              Month
+              {t("pages.overview.activityMonth")}
             </button>
           </div>
         </div>
@@ -228,31 +215,13 @@ export default async function DashboardOverviewPage() {
           ))}
         </div>
         <p className="dashboard-heatmap-legend">
-          <span>Fewer</span>
+          <span>{t("pages.overview.heatmapFewer")}</span>
           <span className="dashboard-heatmap-legend-scale" />
-          <span>More</span>
+          <span>{t("pages.overview.heatmapMore")}</span>
         </p>
       </section>
 
-      <section className="dashboard-card">
-        <h2 className="dashboard-card-title">Integrations</h2>
-        <ul className="dashboard-list">
-          {INTEGRATIONS.map((item) => (
-            <li key={item.name} className="dashboard-list-row">
-              <div className="dashboard-list-icon" aria-hidden>
-                {item.name.charAt(0)}
-              </div>
-              <div className="dashboard-list-body">
-                <p className="dashboard-list-title">{item.name}</p>
-                <p className="dashboard-list-desc">{item.description}</p>
-              </div>
-              <button type="button" className="dashboard-btn dashboard-btn-outline">
-                Connect
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
+      {user && <IntegrationsPanel userId={user.id} />}
     </div>
   );
 }
