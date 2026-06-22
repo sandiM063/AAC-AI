@@ -389,6 +389,51 @@ body {
   font-size: 0.875rem;
 }
 
+.auth-google-button {
+  display: flex;
+  min-height: var(--touch-target, 2.75rem);
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  border-radius: 9999px;
+  border: 1px solid var(--aac-border);
+  background: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--aac-foreground);
+  text-decoration: none;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.auth-google-button:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.auth-google-button-disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--aac-muted);
+  font-size: 0.8125rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--aac-border);
+}
+
 /* OTP verification page */
 .verify-page {
   display: flex;

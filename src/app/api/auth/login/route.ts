@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import { findUserByLogin } from "@/lib/auth-helpers";
-import { SESSION_COOKIE } from "@/lib/session";
+import { SESSION_COOKIE, sessionCookieOptions } from "@/lib/session";
 import { fieldErrors, loginSchema, normalizePhone } from "@/lib/validations/auth";
 
 export async function POST(request: Request) {
@@ -32,6 +32,13 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!user.password) {
+      return NextResponse.json(
+        { error: "This account uses Google sign-in. Click Continue with Google." },
+        { status: 401 },
+      );
+    }
+
     const passwordMatches = await bcrypt.compare(data.password, user.password);
 
     if (!passwordMatches) {
@@ -52,13 +59,7 @@ export async function POST(request: Request) {
       needsOnboarding: !user.onboardingCompletedAt,
     });
 
-    response.cookies.set(SESSION_COOKIE, user.id, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7,
-    });
+    response.cookies.set(SESSION_COOKIE, user.id, sessionCookieOptions);
 
     return response;
   } catch {

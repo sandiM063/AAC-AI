@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE "User" ADD COLUMN "theme" TEXT NOT NULL DEFAULT 'green';
-ALTER TABLE "User" ADD COLUMN "language" TEXT NOT NULL DEFAULT 'en';

@@ -4,34 +4,37 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id            String   @id @default(cuid())
-  firstName     String
-  lastName      String
-  email         String?  @unique
-  countryCode   String?
-  phone         String?
-  password      String
-  emailVerified          Boolean   @default(false)
-  phoneVerified          Boolean   @default(false)
-  profession             String?
-  professionSelectedAt   DateTime?
-  theme                  String    @default("green")
-  language               String    @default("en")
-  aacExperience          String?
-  wantsTutorial          Boolean?
-  onboardingCompletedAt  DateTime?
-  profileImageUpdatedAt  DateTime?
-  createdAt              DateTime  @default(now())
-  updatedAt              DateTime  @updatedAt
+  id                    String    @id @default(cuid())
+  firstName             String
+  lastName              String
+  email                 String?   @unique
+  countryCode           String?
+  phone                 String?
+  password              String?
+  googleId              String?   @unique
+  authProvider          String    @default("credentials")
+  profileImageUrl       String?
+  emailVerified         Boolean   @default(false)
+  phoneVerified         Boolean   @default(false)
+  profession            String?
+  professionSelectedAt  DateTime?
+  theme                 String    @default("green")
+  language              String    @default("en")
+  aacExperience         String?
+  wantsTutorial         Boolean?
+  onboardingCompletedAt DateTime?
+  profileImageUpdatedAt DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
-  assistantMessages      AssistantMessage[]
-  assistantMemoryChunks  AssistantMemoryChunk[]
-  presetInteractions     CommunityPresetInteraction[]
+  assistantMessages     AssistantMessage[]
+  assistantMemoryChunks AssistantMemoryChunk[]
+  presetInteractions    CommunityPresetInteraction[]
 
   @@unique([countryCode, phone])
 }

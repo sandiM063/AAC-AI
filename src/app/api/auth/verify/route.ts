@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { verifyOtp } from "@/lib/otp";
 import { prisma } from "@/lib/prisma";
-import { SESSION_COOKIE } from "@/lib/session";
+import { SESSION_COOKIE, sessionCookieOptions } from "@/lib/session";
 import { verifyOtpSchema } from "@/lib/validations/auth";
 
 export async function POST(request: Request) {
@@ -81,6 +81,7 @@ export async function POST(request: Request) {
         countryCode: pending.countryCode,
         phone: pending.phone,
         password: pending.password,
+        authProvider: "credentials",
         emailVerified: isEmail,
         phoneVerified: !isEmail,
       },
@@ -97,13 +98,7 @@ export async function POST(request: Request) {
       },
     });
 
-    response.cookies.set(SESSION_COOKIE, user.id, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7,
-    });
+    response.cookies.set(SESSION_COOKIE, user.id, sessionCookieOptions);
 
     return response;
   } catch {

@@ -21,6 +21,7 @@ async function main() {
       password,
       firstName: "Demo",
       lastName: "User",
+      authProvider: "credentials",
       emailVerified: true,
     },
   });

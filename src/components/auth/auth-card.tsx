@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { LoginForm } from "./login-form";
 import { RegisterForm } from "./register-form";
 
@@ -140,7 +140,9 @@ export function AuthCard() {
                       Use the email or phone number you registered with.
                     </p>
                     <div className="mt-6">
-                      <LoginForm onSwitchToRegister={() => switchMode("register")} />
+                      <Suspense fallback={null}>
+                        <LoginForm onSwitchToRegister={() => switchMode("register")} />
+                      </Suspense>
                     </div>
                   </>
                 )}
@@ -210,7 +212,9 @@ export function AuthCard() {
                     Use the email or phone number you registered with.
                   </p>
                   <div className="mt-6">
-                    <LoginForm onSwitchToRegister={() => switchMode("register")} />
+                    <Suspense fallback={null}>
+                      <LoginForm onSwitchToRegister={() => switchMode("register")} />
+                    </Suspense>
                   </div>
                 </motion.div>
               )}

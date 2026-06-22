@@ -1,9 +1,10 @@
 "use client";
 
 import { useReadonlyUntilFocus } from "@/hooks/use-readonly-until-focus";
-import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { FormEvent, useEffect, useState } from "react";
 import { InputField } from "./input-field";
+import { AuthDivider, GoogleSignInButton } from "./google-sign-in-button";
 import { LockIcon, MailIcon } from "./auth-icons";
 import { PhoneNumberField } from "./phone-number-field";
 
@@ -11,6 +12,7 @@ type LoginMethod = "email" | "phone";
 
 export function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loginMethod, setLoginMethod] = useState<LoginMethod>("email");
   const [email, setEmail] = useState("");
   const [countryCode, setCountryCode] = useState("+1");
@@ -20,6 +22,17 @@ export function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => vo
   const [formError, setFormError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const passwordField = useReadonlyUntilFocus();
+
+  useEffect(() => {
+    const error = searchParams.get("error");
+    if (error === "google_not_configured") {
+      setFormError("Google sign-in is not configured on this server yet.");
+    } else if (error === "google_state_mismatch") {
+      setFormError("Google sign-in expired. Please try again.");
+    } else if (error === "google_sign_in_failed") {
+      setFormError("Google sign-in failed. Please try again.");
+    }
+  }, [searchParams]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -87,6 +100,9 @@ export function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => vo
           {formError}
         </div>
       )}
+
+      <GoogleSignInButton disabled={isLoading} />
+      <AuthDivider />
 
       <fieldset className="space-y-2">
         <legend className="text-sm font-medium text-aac-foreground">Sign in with</legend>

@@ -3,43 +3,35 @@ import { createHash } from "crypto";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { getProjectRoot } from "@/lib/app-url";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
   prismaClientFingerprint?: string;
 };
 
-function getProjectRoot(): string {
-  return path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
-}
-
 function resolveDatabaseUrl(): string {
-  const projectRoot = getProjectRoot();
-  const defaultDbPath = path.join(projectRoot, "prisma", "dev.db");
-  const fromEnv = process.env.DATABASE_URL;
-
-  if (!fromEnv?.startsWith("file:")) {
-    return `file:${defaultDbPath}`;
+  const fromEnv = process.env.DATABASE_URL?.trim();
+  if (!fromEnv) {
+    throw new Error(
+      "DATABASE_URL is not set. Use a PostgreSQL URL (e.g. Neon) — see .env.example.",
+    );
   }
 
-  const filePath = fromEnv.slice("file:".length);
-
-  if (path.isAbsolute(filePath)) {
+  if (fromEnv.startsWith("postgresql://") || fromEnv.startsWith("postgres://")) {
     return fromEnv;
   }
 
-  if (filePath === "./dev.db" || filePath === "dev.db") {
-    return `file:${defaultDbPath}`;
+  // Legacy local SQLite fallback (dev only).
+  if (fromEnv.startsWith("file:")) {
+    const projectRoot = getProjectRoot();
+    const filePath = fromEnv.slice("file:".length);
+    const absolute =
+      path.isAbsolute(filePath) ? filePath : path.join(projectRoot, filePath.replace(/^\.\//, ""));
+    return `file:${absolute}`;
   }
 
-  // Prisma CLI resolves file:./prisma/dev.db relative to the schema folder,
-  // which incorrectly creates prisma/prisma/dev.db — always use project prisma/dev.db.
-  if (filePath === "./prisma/dev.db" || filePath === "prisma/dev.db") {
-    return `file:${defaultDbPath}`;
-  }
-
-  const relativePath = filePath.replace(/^\.\//, "");
-  return `file:${path.join(projectRoot, relativePath)}`;
+  return fromEnv;
 }
 
 function getGeneratedClientFingerprint(): string {

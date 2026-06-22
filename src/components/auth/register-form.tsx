@@ -4,6 +4,7 @@ import { useReadonlyUntilFocus } from "@/hooks/use-readonly-until-focus";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { InputField } from "./input-field";
+import { AuthDivider, GoogleSignInButton } from "./google-sign-in-button";
 import { LockIcon, MailIcon, UserIcon } from "./auth-icons";
 import { PhoneNumberField } from "./phone-number-field";
 
@@ -95,6 +96,9 @@ export function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void 
           {formError}
         </div>
       )}
+
+      <GoogleSignInButton disabled={isLoading} />
+      <AuthDivider />
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <InputField
