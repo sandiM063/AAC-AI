@@ -1,8 +1,7 @@
-import { PrismaClient } from "@/generated/prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { createHash } from "crypto";
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
 import { getProjectRoot } from "@/lib/app-url";
 
 const globalForPrisma = globalThis as unknown as {
@@ -12,41 +11,38 @@ const globalForPrisma = globalThis as unknown as {
 
 function resolveDatabaseUrl(): string {
   const fromEnv = process.env.DATABASE_URL?.trim();
-  if (!fromEnv) {
+  const normalized = fromEnv
+    ? fromEnv.replace(/^["']|["']$/g, "").trim()
+    : "";
+
+  if (!normalized) {
     throw new Error(
       "DATABASE_URL is not set. Use a PostgreSQL URL (e.g. Neon) — see .env.example.",
     );
   }
 
-  if (fromEnv.startsWith("postgresql://") || fromEnv.startsWith("postgres://")) {
-    return fromEnv;
+  if (normalized.startsWith("postgresql://") || normalized.startsWith("postgres://")) {
+    return normalized;
   }
 
   // Legacy local SQLite fallback (dev only).
-  if (fromEnv.startsWith("file:")) {
+  if (normalized.startsWith("file:")) {
     const projectRoot = getProjectRoot();
-    const filePath = fromEnv.slice("file:".length);
+    const filePath = normalized.slice("file:".length);
     const absolute =
       path.isAbsolute(filePath) ? filePath : path.join(projectRoot, filePath.replace(/^\.\//, ""));
     return `file:${absolute}`;
   }
 
-  return fromEnv;
+  return normalized;
 }
 
 function getGeneratedClientFingerprint(): string {
-  const classPath = path.join(
-    getProjectRoot(),
-    "src",
-    "generated",
-    "prisma",
-    "internal",
-    "class.ts",
-  );
+  const clientPath = path.join(getProjectRoot(), "node_modules", ".prisma", "client", "index.js");
 
   try {
     return createHash("sha256")
-      .update(fs.readFileSync(classPath))
+      .update(fs.readFileSync(clientPath))
       .digest("hex")
       .slice(0, 16);
   } catch {

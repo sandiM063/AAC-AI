@@ -1,10 +1,13 @@
 import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { resolveDatabaseUrlFromEnv } from "./normalize-database-url.mjs";
 
 /** Prisma CLI needs DATABASE_URL even for `generate` (no DB connection). */
-if (!process.env.DATABASE_URL?.trim()) {
+if (!resolveDatabaseUrlFromEnv()) {
   process.env.DATABASE_URL = "postgresql://localhost:5432/aacnai?schema=public";
+} else {
+  process.env.DATABASE_URL = resolveDatabaseUrlFromEnv();
 }
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");

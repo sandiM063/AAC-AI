@@ -1,6 +1,7 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider      = "prisma-client-js"
+  // Netlify/AWS Lambda runtime (Node 20+) — build image is Debian, runtime is RHEL.
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {

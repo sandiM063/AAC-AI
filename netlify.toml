@@ -4,5 +4,9 @@
 [build.environment]
   NODE_VERSION = "22"
 
+# Bundle Prisma query engines into serverless functions.
+[functions]
+  included_files = ["./node_modules/.prisma/client/**"]
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"
