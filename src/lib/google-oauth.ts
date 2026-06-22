@@ -20,8 +20,24 @@ export function isGoogleAuthConfigured(): boolean {
   return Boolean(process.env.GOOGLE_CLIENT_ID?.trim() && process.env.GOOGLE_CLIENT_SECRET?.trim());
 }
 
+/** Use the site the user actually opened (Netlify/proxy-safe), not a stale AUTH_URL. */
+function getOAuthOrigin(request: Request): string {
+  const url = new URL(request.url);
+  const forwardedHost = request.headers.get("x-forwarded-host");
+  const forwardedProto = request.headers.get("x-forwarded-proto");
+
+  if (forwardedHost) {
+    const host = forwardedHost.split(",")[0]?.trim();
+    const protocol = forwardedProto?.split(",")[0]?.trim() || "https";
+    return `${protocol}://${host}`;
+  }
+
+  return `${url.protocol}//${url.host}`;
+}
+
 export function getGoogleRedirectUri(request?: Request): string {
-  return `${getAppUrl(request)}/api/auth/google/callback`;
+  const origin = request ? getOAuthOrigin(request) : getAppUrl();
+  return `${origin.replace(/\/$/, "")}/api/auth/google/callback`;
 }
 
 export function buildGoogleAuthUrl(redirectUri: string, state: string): string {
